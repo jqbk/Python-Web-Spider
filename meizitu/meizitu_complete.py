@@ -163,7 +163,7 @@ if __name__ == '__main__':
     DM = DownloadMeizitu(base_url)
     # urls, names = get_page(url)
     # print(urls, names)
-    #DM.download_every_pic()
+    DM.download_every_pic()
     #print(config_proxy())
     #print(len(DM.get_pic_url()))
     # print(len(get_pic_url(url)))
