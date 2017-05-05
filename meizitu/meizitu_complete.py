@@ -101,7 +101,7 @@ class DownloadMeizitu(object):
             pic_url = []
             selector = self.get_selector(each_integrated_url)
             # 设置延时访问
-            time.sleep(0.5)
+            time.sleep(0.5+random.random())
             pic_url.extend(selector.xpath('//li[@class="wp-item"]/div/div/a/@href'))
             # print(pic_url)
             yield pic_url
@@ -116,7 +116,7 @@ class DownloadMeizitu(object):
                 result = next(gen)
                 for every_single_pic in result:
                     if every_single_pic:
-                        time.sleep(0.5)
+                        time.sleep(0.5+random.random())
                         selector = self.get_selector(every_single_pic)
                         
                         every_single_pic_url = selector.xpath('//div[@id="picture"]/p/img/@src')
@@ -126,7 +126,7 @@ class DownloadMeizitu(object):
                         os.chdir(path)
                         for i in range(len(every_single_pic_url)):
                             with open(path + every_single_pic_name[i] + '('+str(i+1)+')' + '.jpg', 'wb') as f:
-                                time.sleep(0.5)
+                                time.sleep(0.5+random.random())
                                 print('正在下载名为:"%s"的图片，请稍后...' % (every_single_pic_name[i] + '('+str(i+1)+')'))
                                 f.write(self.request_page(every_single_pic_url[i]))
                                 print('名为:"%s"的图片下载完成，准备下载下一张...\n' % (every_single_pic_name[i] + '('+str(i+1)+')'))
