@@ -10,6 +10,7 @@ import requests
 import random
 import time
 from lxml import etree
+from util_config import CONFIG_USERAGENT_PC
 
 class DownloadMeizitu(object):
     """
@@ -22,25 +23,7 @@ class DownloadMeizitu(object):
         """
         为每一次请求构造浏览器响应头
         """
-        user_agent_list = [
-            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",
-            "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11",
-            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6",
-            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1090.0 Safari/536.6",
-            "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/19.77.34.5 Safari/537.1",
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.9 Safari/536.5",
-            "Mozilla/5.0 (Windows NT 6.0) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.36 Safari/536.5",
-            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
-            "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1063.0 Safari/536.3",
-            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
-            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1062.0 Safari/536.3",
-            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
-            "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
-            "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.1 Safari/536.3",
-            "Mozilla/5.0 (Windows NT 6.2) AppleWebKit/536.3 (KHTML, like Gecko) Chrome/19.0.1061.0 Safari/536.3",
-            "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24",
-            "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/535.24 (KHTML, like Gecko) Chrome/19.0.1055.1 Safari/535.24"]
+        user_agent_list = CONFIG_USERAGENT_PC
         UA = random.choice(user_agent_list)
         headers = {'User-Agent': UA}
         return headers
@@ -49,9 +32,10 @@ class DownloadMeizitu(object):
         """
         为每一次请求构造代理IP
         """
-        ip_html = requests.get('http://haoip.cc/tiqu.htm')
-        iplist = re.findall(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{2,4}', ip_html.text)
-        ip = random.choice(iplist).strip()
+        ip_url = 'http://www.youdaili.net/Daili/guonei/36750.html'
+        selector = self.get_selector(ip_url)
+        ip_list = selector.xpath('//div[@class="content"]/p/p/text()')
+        ip = [each.split('@')[0].strip() for each in ip_list]
         proxies = {'http': ip}
         return proxies
 
@@ -72,7 +56,7 @@ class DownloadMeizitu(object):
         # proxy = self.config_proxy()
         headers = self.config_user_agent() 
         data = requests.get(page_url, headers=headers)
-        data.encoding = 'gb2312'
+        data.encoding = 'gb2312' 
         selector = etree.HTML(data.text)
         return selector
 
@@ -151,6 +135,7 @@ class DownloadMeizitu(object):
 
             except StopIteration:
                 break
+
         print('所有图片下载完成!')
 
 start = time.time()
@@ -161,7 +146,7 @@ if __name__ == '__main__':
     # urls, names = get_page(url)
     # print(urls, names)
     DM.download_every_pic()
-    #print(config_proxy())
+    #print(DM.config_proxy())
     #print(len(DM.get_pic_url()))
 
 stop = time.time()
