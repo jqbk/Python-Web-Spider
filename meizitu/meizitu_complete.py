@@ -126,35 +126,32 @@ class DownloadMeizitu(object):
         """
         获取每张图片的具体地址，并下载保存
         """
-        '''
-        val = True
-        while val == True:
+        gen = self.get_pic_url()
+        while True:
             try:
-                result = next(self.get_pic_url())
-            except StopIteration:
-                val = False
-                break
-            else:
-        '''
-        result = next(self.get_pic_url())
-        for every_single_pic in result:
-            if every_single_pic:
-                time.sleep(0.5)
-                selector = self.get_selector(every_single_pic)
-                
-                every_single_pic_url = selector.xpath('//div[@id="picture"]/p/img/@src')
-                every_single_pic_name = selector.xpath('//div[@id="picture"]/p/img/@alt')
-
-                path = 'F:\\SpiderData\\妹子图\\'
-                os.chdir(path)
-                for i in range(len(every_single_pic_url)):
-                    with open(path + every_single_pic_name[i] + '('+str(i+1)+')' + '.jpg', 'wb') as f:
+                result = next(gen)
+                for every_single_pic in result:
+                    if every_single_pic:
                         time.sleep(0.5)
-                        print('正在下载名为:"%s"的图片，请稍后...' % (every_single_pic_name[i] + '('+str(i+1)+')'))
-                        f.write(self.request_page(every_single_pic_url[i]))
-                        print('名为:"%s"的图片下载完成，准备下载下一张...\n' % (every_single_pic_name[i] + '('+str(i+1)+')'))
+                        selector = self.get_selector(every_single_pic)
+                        
+                        every_single_pic_url = selector.xpath('//div[@id="picture"]/p/img/@src')
+                        every_single_pic_name = selector.xpath('//div[@id="picture"]/p/img/@alt')
 
-        print('下载完成!')
+                        path = 'F:\\SpiderData\\妹子图\\'
+                        os.chdir(path)
+                        for i in range(len(every_single_pic_url)):
+                            with open(path + every_single_pic_name[i] + '('+str(i+1)+')' + '.jpg', 'wb') as f:
+                                time.sleep(0.5)
+                                print('正在下载名为:"%s"的图片，请稍后...' % (every_single_pic_name[i] + '('+str(i+1)+')'))
+                                f.write(self.request_page(every_single_pic_url[i]))
+                                print('名为:"%s"的图片下载完成，准备下载下一张...\n' % (every_single_pic_name[i] + '('+str(i+1)+')'))
+
+                print('======该部分下载完成!======\n')
+
+            except StopIteration:
+                break
+        print('所有图片下载完成!')
 
 start = time.time()
 
@@ -166,7 +163,6 @@ if __name__ == '__main__':
     DM.download_every_pic()
     #print(config_proxy())
     #print(len(DM.get_pic_url()))
-    # print(len(get_pic_url(url)))
 
 stop = time.time()
 # 计算程序用时
