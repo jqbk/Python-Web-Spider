@@ -35,7 +35,7 @@ class DownloadMeizitu(object):
         ip_url = 'http://www.youdaili.net/Daili/guonei/36750.html'
         selector = self.get_selector(ip_url)
         ip_list = selector.xpath('//div[@class="content"]/p/p/text()')
-        ip = [each.split('@')[0].strip() for each in ip_list]
+        ip = random.choice([each.split('@')[0].strip() for each in ip_list])
         proxies = {'http': ip}
         return proxies
 
