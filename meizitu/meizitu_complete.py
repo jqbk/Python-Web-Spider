@@ -36,8 +36,10 @@ class DownloadMeizitu(object):
         selector = etree.HTML(requests.get(ip_url, headers=headers).text)
         ip_list = selector.xpath('//ul[@class="l2"]/span[1]/li/text()')
         port_list = selector.xpath('//ul[@class="l2"]/span[2]/li/text()')
-        Ip = random.choice(['http://' + ip + ':' + port for ip in ip_list for port in port_list])
-        return {'http': Ip}
+        port_type_list = selector.xpath('//ul[@class="l2"]/span[4]/li/a/text()')
+        port_type_accurate = [each[:4] if len(each)>5 else each for each in port_type_list]
+        result = random.choice([port_type + '#' + ip + ':' + port for port_type in port_type_accurate for ip in ip_list for port in port_list])
+        return {result.split('#', 1)[0].strip(): result.split('#', 1)[1].strip()}
 
     def request_page(self, single_url):
         """
