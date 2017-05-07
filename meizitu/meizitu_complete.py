@@ -25,27 +25,27 @@ class DownloadMeizitu(object):
         """
         user_agent_list = CONFIG_USERAGENT_PC
         UA = random.choice(user_agent_list)
-        headers = {'User-Agent': UA}
-        return headers
+        return {'User-Agent': UA}
 
     def config_proxy(self):
         """
         为每一次请求构造代理IP
         """
-        ip_url = 'http://www.youdaili.net/Daili/guonei/36750.html'
-        selector = self.get_selector(ip_url)
-        ip_list = selector.xpath('//div[@class="content"]/p/p/text()')
-        ip = random.choice([each.split('@')[0].strip() for each in ip_list])
-        proxies = {'http': ip}
-        return proxies
+        ip_url = 'http://www.data5u.com'
+        headers = self.config_user_agent()
+        selector = etree.HTML(requests.get(ip_url, headers=headers).text)
+        ip_list = selector.xpath('//ul[@class="l2"]/span[1]/li/text()')
+        port_list = selector.xpath('//ul[@class="l2"]/span[2]/li/text()')
+        Ip = random.choice(['http://' + ip + ':' + port for ip in ip_list for port in port_list])
+        return {'http': Ip}
 
     def request_page(self, single_url):
         """
         返回具体图片地址的二进制内容，用于下载
         """
-        # proxy = self.config_proxy()
+        proxy = self.config_proxy()
         headers = self.config_user_agent() 
-        data = requests.get(single_url, headers=headers)
+        data = requests.get(single_url, headers=headers, proxies=proxy)
         data.encoding = 'gb2312'
         return data.content
 
@@ -53,9 +53,9 @@ class DownloadMeizitu(object):
         """
         获取网页页面的XML文档的节点对象
         """
-        # proxy = self.config_proxy()
+        proxy = self.config_proxy()
         headers = self.config_user_agent() 
-        data = requests.get(page_url, headers=headers)
+        data = requests.get(page_url, headers=headers, proxies=proxy)
         data.encoding = 'gb2312' 
         selector = etree.HTML(data.text)
         return selector
@@ -101,7 +101,7 @@ class DownloadMeizitu(object):
             pic_url = []
             selector = self.get_selector(each_integrated_url)
             # 设置延时访问
-            time.sleep(0.5+random.random())
+            time.sleep(0.5 + random.random())
             pic_url.extend(selector.xpath('//li[@class="wp-item"]/div/div/a/@href'))
             # print(pic_url)
             yield pic_url
@@ -116,7 +116,7 @@ class DownloadMeizitu(object):
                 result = next(gen)
                 for every_single_pic in result:
                     if every_single_pic:
-                        time.sleep(0.5+random.random())
+                        time.sleep(0.5 + random.random())
                         selector = self.get_selector(every_single_pic)
                         
                         every_single_pic_url = selector.xpath('//div[@id="picture"]/p/img/@src')
@@ -126,7 +126,7 @@ class DownloadMeizitu(object):
                         os.chdir(path)
                         for i in range(len(every_single_pic_url)):
                             with open(path + every_single_pic_name[i] + '('+str(i+1)+')' + '.jpg', 'wb') as f:
-                                time.sleep(0.5+random.random())
+                                time.sleep(0.5 + random.random())
                                 print('正在下载名为:"%s"的图片，请稍后...' % (every_single_pic_name[i] + '('+str(i+1)+')'))
                                 f.write(self.request_page(every_single_pic_url[i]))
                                 print('名为:"%s"的图片下载完成，准备下载下一张...\n' % (every_single_pic_name[i] + '('+str(i+1)+')'))
@@ -146,8 +146,8 @@ if __name__ == '__main__':
     # urls, names = get_page(url)
     # print(urls, names)
     DM.download_every_pic()
-    #print(DM.config_proxy())
-    #print(len(DM.get_pic_url()))
+    # print(DM.config_proxy())
+    # print(len(DM.get_pic_url()))
 
 stop = time.time()
 # 计算程序用时
