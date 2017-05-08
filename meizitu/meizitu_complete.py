@@ -50,9 +50,19 @@ class DownloadMeizitu(object):
         """
         返回具体图片地址的二进制内容，用于下载
         """
-        proxy = self.config_proxy()
-        headers = self.config_user_agent() 
-        data = requests.get(single_url, headers=headers, proxies=proxy)
+        # proxy = self.config_proxy()
+        headers = self.config_user_agent()
+        '''
+        for each_proxy in proxy: 
+            try:
+                data = requests.get(single_url, headers=headers, proxies=each_proxy)
+                data.encoding = 'gb2312'
+            except requests.exceptions.ProxyError:
+                pass
+            else:
+                break
+        '''
+        data = requests.get(single_url, headers=headers)
         data.encoding = 'gb2312'
         return data.content
 
