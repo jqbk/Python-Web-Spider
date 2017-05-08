@@ -1,7 +1,7 @@
 #! usr/bin/env python3
 # -*- coding:utf-8 -*-
 
-__author__ = 'Qi'
+__author__ = 'jqbk'
 __date__ = '2017-05-02'
 
 import os
@@ -70,9 +70,9 @@ class DownloadMeizitu(object):
         """
         获取网页页面的XML文档的节点对象
         """
-        proxy = self.config_proxy()
+        # proxy = self.config_proxy()
         headers = self.config_user_agent() 
-        data = requests.get(page_url, headers=headers, proxies=proxy)
+        data = requests.get(page_url, headers=headers)
         data.encoding = 'gb2312' 
         selector = etree.HTML(data.text)
         return selector
@@ -101,8 +101,6 @@ class DownloadMeizitu(object):
             except IndexError:
                 break
             else:
-                # print(each_page_url)
-                # print(max_page)
                 # 用正则表达式提取最大页数
                 max_number = re.search(r'\d{1,2}(?=\.html)', max_page)
                 for number in range(int(max_number[0])): # 第0个子组,即匹配的内容
