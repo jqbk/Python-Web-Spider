@@ -31,15 +31,20 @@ class DownloadMeizitu(object):
         """
         为每一次请求构造代理IP
         """
-        ip_url = 'http://www.data5u.com'
+        ip_url = 'http://www.data5u.com/free/'
         headers = self.config_user_agent()
         selector = etree.HTML(requests.get(ip_url, headers=headers).text)
         ip_list = selector.xpath('//ul[@class="l2"]/span[1]/li/text()')
         port_list = selector.xpath('//ul[@class="l2"]/span[2]/li/text()')
         port_type_list = selector.xpath('//ul[@class="l2"]/span[4]/li/a/text()')
+        # 有的端口类型在网页上显示的是http,https，这类端口类型需要处理
         port_type_accurate = [each[:4] if len(each)>5 else each for each in port_type_list]
-        result = random.choice([port_type + '#' + 'http://' + ip + ':' + port for port_type in port_type_accurate for ip in ip_list for port in port_list])
-        return {result.split('#', 1)[0].strip(): result.split('#', 1)[1].strip()}
+        result = [port_type + '#' + 'http://' + ip + ':' + port for port_type in port_type_accurate for ip in ip_list for port in port_list]
+        # 去除重复元素
+        result = list(set(result))
+        # 剔除https代理(妹子图只支持http代理)
+        result_sat = [each for each in result if each[:5] != 'https']
+        return [{each.split('#', 1)[0].strip(): each.split('#', 1)[1].strip()} for each in result_sat]
 
     def request_page(self, single_url):
         """
