@@ -166,22 +166,18 @@ if __name__ == '__main__':
     DM = DownloadMeizitu(base_url)
 
     print('Parent process %s.' % os.getpid())
-    pool = multiprocessing.Pool(processes=2)
 
     pic_gen = DM.get_pic_url()
     start = time.time()
     while True:
         try:
             pic_url = next(pic_gen)
+            loop = asyncio.get_event_loop()
             for every_single_pic in pic_url:
-                pool.apply_async(func=DM.download_every_pic, args=(every_single_pic,))
-                loop = asyncio.get_event_loop()
                 loop.run_until_complete(DM.download_every_pic(every_single_pic))
+            loop.close()
         except StopIteration:
             break
-    loop.close()
-    pool.close()
-    pool.join()
 
     stop = time.time()
     print('所有图片下载完成!')
