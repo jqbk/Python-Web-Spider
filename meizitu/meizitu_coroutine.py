@@ -120,7 +120,7 @@ class DownloadMeizitu(object):
                         integrated_url = self.url + max_page.replace(max_number.group(0)+'.html', str(number+1)+'.html')
                         yield integrated_url
 
-# 字符串和列表对象不能应用与await语句中
+# 字符串和列表对象不能应用于await语句中
     def get_pic_url(self):
         """
         获取子页面下图片组的地址
